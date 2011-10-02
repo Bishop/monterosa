@@ -1,0 +1,4 @@
+.idea
+var/tmp/*
+www/paths.php
+etc/environment.php
