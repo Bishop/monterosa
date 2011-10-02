@@ -1,6 +1,6 @@
 <?php
 
-require '../etc/environment.php';
+require __DIR__ . '/../etc/environment.php';
 
 define('RESPONSE_OK', 200);
 define('RESPONSE_BAD_REQUEST', 400);
@@ -19,8 +19,7 @@ function response($code) {
 
 $_SERVER['REQUEST_METHOD'] === 'GET' or response(RESPONSE_BAD_REQUEST);
 
-(array_key_exists('id', $_GET)
-		&& array_key_exists('email', $_GET)) or response(RESPONSE_BAD_REQUEST);
+(isset($_GET['id']) && isset($_GET['email'])) or response(RESPONSE_BAD_REQUEST);
 
 $id = (int)$_GET['id'];
 $email = (string)$_GET['email'];
