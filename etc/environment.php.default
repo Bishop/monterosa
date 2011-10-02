@@ -1,0 +1,9 @@
+<?php
+
+$config = array(
+	'db' => 'mysql://writer:secret@localhost:3306/ecoll',
+	'cache' => 'memcache://localhost:11211/',
+	'id_min' => 1,
+	'id_max' => 65535, // 2 ** 16 - 1
+	'email_max' => 100,
+);
