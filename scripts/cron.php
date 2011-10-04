@@ -2,14 +2,6 @@
 
 require __DIR__ . '/../etc/environment.php';
 
-$config = array(
-	'db' => 'mysql://root:@localhost:3306/ecoll',
-	'cache' => 'memcache://localhost:11211/',
-	'id_min' => 1,
-	'id_max' => 65535,
-	'email_max' => 100,
-);
-
 define('STATUS_BAD_MEMCACHE', 1);
 define('STATUS_BAD_MYSQL', 2);
 define('STATUS_NO_DATA', 3);
@@ -31,10 +23,7 @@ function terminate($code)
 	exit();
 }
 
-isset($config['cache']) or terminate(STATUS_BAD_MEMCACHE);
-$cache_config = parse_url($config['cache']) or terminate(STATUS_BAD_MEMCACHE);
-
-$mc = memcache_connect($cache_config['host'], $cache_config['port']) or terminate(STATUS_BAD_MEMCACHE);
+$mc = memcache_connect(MC_HOST, MC_PORT) or terminate(STATUS_BAD_MEMCACHE);
 
 $pop = 0;
 
@@ -54,11 +43,8 @@ for ($i = $pop; $i <= $put; $i++) {
 	memcache_delete($mc, $i);
 }
 
-isset($config['db']) or terminate(STATUS_BAD_MYSQL);
-$db_config = parse_url($config['db']) or terminate(STATUS_BAD_MYSQL);
-
-(mysql_connect("{$db_config['host']}:{$db_config['port']}", $db_config['user'], @$db_config['pass'])
-	&& mysql_select_db(trim($db_config['path'], '/'))) or terminate(STATUS_BAD_MYSQL);
+(mysql_connect(DB_HOST . ':' . DB_PORT, DB_USER, DB_PASS)
+	&& mysql_select_db(DB_NAME)) or terminate(STATUS_BAD_MYSQL);
 
 $chunk_size = 100;
 foreach (array_chunk($data, $chunk_size) as $chunk) {

@@ -2,6 +2,12 @@
 
 require __DIR__ . '/../etc/environment.php';
 
+$config = array(
+	'id_min' => 1,
+	'id_max' => 65535,
+	'email_max' => 100,
+);
+
 define('RESPONSE_OK', 200);
 define('RESPONSE_BAD_REQUEST', 400);
 define('RESPONSE_BAD_SERVER', 500);
@@ -29,10 +35,7 @@ $email_strlen = mb_strlen($email);
 ($id >= $config['id_min'] && $id <= $config['id_max']) or response(RESPONSE_BAD_REQUEST);
 ($email_strlen > 0 && $email_strlen <= $config['email_max']) or response(RESPONSE_BAD_REQUEST);
 
-isset($config['cache']) or response(RESPONSE_BAD_SERVER);
-$cache_config = parse_url($config['cache']) or response(RESPONSE_BAD_SERVER);
-
-$mc = memcache_connect($cache_config['host'], $cache_config['port']) or response(RESPONSE_BAD_SERVER);
+$mc = memcache_connect(MC_HOST, MC_PORT) or response(RESPONSE_BAD_SERVER);
 
 memcache_add($mc, 'put', 0, false);
 
