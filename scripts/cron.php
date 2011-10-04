@@ -24,20 +24,18 @@ function terminate($code)
 }
 
 $mc = memcache_connect(MC_HOST, MC_PORT) or terminate(STATUS_BAD_MEMCACHE);
-
-$pop = 0;
+$pop = 1;
 
 memcache_add($mc, 'pop', $pop, false);
 
 $pop = memcache_get($mc, 'pop') or terminate(STATUS_BAD_MEMCACHE);
 $put = memcache_get($mc, 'put') or terminate(STATUS_BAD_MEMCACHE);
-memcache_set($mc, 'pop', $put) or terminate(STATUS_BAD_MEMCACHE);
+memcache_set($mc, 'pop', $put + 1) or terminate(STATUS_BAD_MEMCACHE);
 
-$put > $pop or terminate(STATUS_NO_DATA);
+$put >= $pop or terminate(STATUS_NO_DATA);
 
 $data = array();
 
-$pop++;
 for ($i = $pop; $i <= $put; $i++) {
 	$data[] = memcache_get($mc, $i);
 	memcache_delete($mc, $i);
