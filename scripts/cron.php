@@ -33,6 +33,7 @@ memcache_add($mc, 'pop', $pop, false);
 
 $pop = memcache_get($mc, 'pop') or terminate(STATUS_BAD_MEMCACHE);
 $put = memcache_get($mc, 'put') or terminate(STATUS_BAD_MEMCACHE);
+memcache_set($mc, 'pop', $put) or terminate(STATUS_BAD_MEMCACHE);
 
 $put > $pop or terminate(STATUS_NO_DATA);
 
@@ -43,8 +44,6 @@ for ($i = $pop; $i <= $put; $i++) {
     $data[] = memcache_get($mc, $i);
     memcache_delete($mc, $i);
 }
-echo $pop . ' ' . $put;
-memcache_set($mc, 'pop', $put) or terminate(STATUS_BAD_MEMCACHE);
 
 isset($config['db']) or terminate(STATUS_BAD_MYSQL);
 $db_config = parse_url($config['db']) or terminate(STATUS_BAD_MYSQL);
