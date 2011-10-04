@@ -28,3 +28,15 @@ $email_strlen = mb_strlen($email);
 ($id >= $config['id_min'] && $id <= $config['id_max']) or response(RESPONSE_BAD_REQUEST);
 ($email_strlen > 0 && $email_strlen <= $config['email_max']) or response(RESPONSE_BAD_REQUEST);
 
+isset($config['cache']) or response(RESPONSE_BAD_SERVER);
+$cache_config = parse_url($config['cache']) or response(RESPONSE_BAD_SERVER);
+
+$mc = memcache_connect($cache_config['host'], $cache_config['port']) or response(RESPONSE_BAD_SERVER);
+
+memcache_add($mc, 'put', 0, false);
+
+$key = memcache_increment($mc, 'put') or response(RESPONSE_BAD_SERVER);
+
+memcache_set($mc, $key, array(&$id, &$email)) or response(RESPONSE_BAD_SERVER);
+
+response(RESPONSE_OK);
