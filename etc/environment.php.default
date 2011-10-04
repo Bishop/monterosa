@@ -1,9 +1,19 @@
 <?php
 
-$config = array(
-	'db' => 'mysql://writer:secret@localhost:3306/ecoll',
-	'cache' => 'memcache://localhost:11211/',
-	'id_min' => 1,
-	'id_max' => 65535, // 2 ** 16 - 1
-	'email_max' => 100,
-);
+// Database access details
+define('DB_HOST', 'localhost');
+define('DB_PORT', '3306');
+define('DB_NAME', 'ecoll');
+define('DB_USER', 'root');
+define('DB_PASS', '');
+
+// Memcache access details
+define('MC_HOST', 'localhost');
+define('MC_PORT', '11211');
+
+// Frontend cluster
+define('FRONTEND_HOSTNAME_TEMPLATE', 'frontend%u.ecoll.monterosa.co.uk');
+define('FRONTEND_NUMBER_OF_HOSTS', 3);
+
+// Backend host
+define('BACKEND_HOSTNAME', 'backend.ecoll.monterosa.co.uk');

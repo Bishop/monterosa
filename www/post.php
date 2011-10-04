@@ -6,7 +6,8 @@ define('RESPONSE_OK', 200);
 define('RESPONSE_BAD_REQUEST', 400);
 define('RESPONSE_BAD_SERVER', 500);
 
-function response($code) {
+function response($code)
+{
 	$response_codes = array(
 		RESPONSE_OK => 'HTTP/1.1 200 OK',
 		RESPONSE_BAD_REQUEST => 'HTTP/1.1 400 Bad Request',

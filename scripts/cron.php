@@ -2,24 +2,33 @@
 
 require __DIR__ . '/../etc/environment.php';
 
+$config = array(
+	'db' => 'mysql://root:@localhost:3306/ecoll',
+	'cache' => 'memcache://localhost:11211/',
+	'id_min' => 1,
+	'id_max' => 65535,
+	'email_max' => 100,
+);
+
 define('STATUS_BAD_MEMCACHE', 1);
 define('STATUS_BAD_MYSQL', 2);
 define('STATUS_NO_DATA', 3);
 define('STATUS_OK', 4);
 
-function terminate($code) {
+function terminate($code)
+{
 	$codes = array(
-        STATUS_BAD_MEMCACHE => 'MemCache Error',
-        STATUS_BAD_MYSQL => 'MySQL Error',
-        STATUS_NO_DATA => 'No Data',
-        STATUS_OK => 'Success',
+		STATUS_BAD_MEMCACHE => 'MemCache Error',
+		STATUS_BAD_MYSQL => 'MySQL Error',
+		STATUS_NO_DATA => 'No Data',
+		STATUS_OK => 'Success',
 	);
 
 	if ($f = fopen(__DIR__ . '/../var/log/cron.log', 'ab')) {
-        fwrite($f, sprintf("%s: %s\n", date('Y-m-d H:i:s O'), $codes[$code]));
-        fclose($f);
-    }
-    exit();
+		fwrite($f, sprintf("%s: %s\n", date('Y-m-d H:i:s O'), $codes[$code]));
+		fclose($f);
+	}
+	exit();
 }
 
 isset($config['cache']) or terminate(STATUS_BAD_MEMCACHE);
@@ -41,27 +50,27 @@ $data = array();
 
 $pop++;
 for ($i = $pop; $i <= $put; $i++) {
-    $data[] = memcache_get($mc, $i);
-    memcache_delete($mc, $i);
+	$data[] = memcache_get($mc, $i);
+	memcache_delete($mc, $i);
 }
 
 isset($config['db']) or terminate(STATUS_BAD_MYSQL);
 $db_config = parse_url($config['db']) or terminate(STATUS_BAD_MYSQL);
 
 (mysql_connect("{$db_config['host']}:{$db_config['port']}", $db_config['user'], @$db_config['pass'])
-    && mysql_select_db(trim($db_config['path'], '/'))) or terminate(STATUS_BAD_MYSQL);
+	&& mysql_select_db(trim($db_config['path'], '/'))) or terminate(STATUS_BAD_MYSQL);
 
 $chunk_size = 100;
 foreach (array_chunk($data, $chunk_size) as $chunk) {
-    $values = array();
-    $a_len = count($chunk);
-    for ($i = 0; $i < $a_len; ++$i) {
-        $values[] = sprintf('(%s, \'%s\')', $chunk[$i][0], mysql_real_escape_string($chunk[$i][1]));
-    }
+	$values = array();
+	$a_len = count($chunk);
+	for ($i = 0; $i < $a_len; ++$i) {
+		$values[] = sprintf('(%s, \'%s\')', $chunk[$i][0], mysql_real_escape_string($chunk[$i][1]));
+	}
 
-    $query = 'insert emails (id, email) values ' . implode(', ', $values) . ' on duplicate key update email=values(email)';
+	$query = 'insert emails (id, email) values ' . implode(', ', $values) . ' on duplicate key update email=values(email)';
 
-    mysql_query($query) or terminate(STATUS_BAD_MYSQL);
+	mysql_query($query) or terminate(STATUS_BAD_MYSQL);
 }
 
 terminate(STATUS_OK);
