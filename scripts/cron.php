@@ -27,14 +27,15 @@ function terminate($code)
 
 $pid_file = __DIR__ . '/../var/run/cron.pid';
 if (file_exists($pid_file)) {
-	if (time() - fileatime($pid_file) > 60) {
-		unlink($pid_file);
-	} else {
+	$pid = (int)file_get_contents($pid_file);
+	if (file_exists("/proc/$pid")) {
 		terminate(STATUS_ALREADY_RUNNING);
+	} else {
+		unlink($pid_file);
 	}
 }
 
-touch($pid_file);
+file_put_contents($pid_file, strval(posix_getpid()));
 register_shutdown_function(function() use ($pid_file) { unlink($pid_file); });
 
 $mc = memcache_connect(MC_HOST, MC_PORT) or terminate(STATUS_BAD_MEMCACHE);
@@ -71,7 +72,5 @@ while (true) {
 
 		mysql_query($query) or terminate(STATUS_BAD_MYSQL);
 	}
-
-	touch($pid_file);
 }
 terminate(STATUS_OK);
