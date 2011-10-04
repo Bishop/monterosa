@@ -1,4 +1,5 @@
 .idea
 var/tmp/*
+var/log/*
 www/paths.php
 etc/environment.php
