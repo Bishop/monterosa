@@ -24,12 +24,12 @@ function response($code)
 	exit();
 }
 
-$_SERVER['REQUEST_METHOD'] === 'GET' or response(RESPONSE_BAD_REQUEST);
+$_SERVER['REQUEST_METHOD'] === 'POST' or response(RESPONSE_BAD_REQUEST);
 
-(isset($_GET['id']) && isset($_GET['email'])) or response(RESPONSE_BAD_REQUEST);
+(isset($_POST['id']) && isset($_POST['email'])) or response(RESPONSE_BAD_REQUEST);
 
-$id = (int)$_GET['id'];
-$email = (string)$_GET['email'];
+$id = (int)$_POST['id'];
+$email = (string)$_POST['email'];
 $email_strlen = mb_strlen($email);
 
 ($id >= $config['id_min'] && $id <= $config['id_max']) or response(RESPONSE_BAD_REQUEST);
